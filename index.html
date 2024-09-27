@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <title>RuneRain</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+        #matrix-canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        const columnWidth = 10;
+        const columns = Math.floor(width / columnWidth);
+        const drops = [];
+
+        const colorScheme = {
+            primary: '#00ffff',
+            secondary: '#e94560',
+            tertiary: '#c5ee4f',
+            background: '#0c0c1d'
+        };
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = {
+                y: 1,
+                x: i * columnWidth,
+                glowing: false,
+                glowColor: null
+            };
+        }
+
+        const runes = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ';
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.font = '20px "Arial Unicode MS", sans-serif';
+
+            for (let i = 0; i < drops.length; i++) {
+                const rune = runes[Math.floor(Math.random() * runes.length)];
+                
+                if (!drops[i].glowing && Math.random() < 0.0001) {
+                    drops[i].glowing = true;
+                    drops[i].glowColor = Math.random() < 0.5 ? colorScheme.primary : colorScheme.secondary;
+                }
+
+                if (drops[i].glowing) {
+                    ctx.fillStyle = drops[i].glowColor;
+                } else {
+                    ctx.fillStyle = '#FFF';
+                }
+
+                ctx.fillText(rune, drops[i].x, drops[i].y * 20);
+
+                if (drops[i].y * 20 > height && Math.random() > 0.99) {
+                    drops[i].y = 0;
+                    drops[i].glowing = false;
+                }
+                drops[i].y += 0.45;
+            }
+        }
+
+        function animate() {
+            draw();
+            setTimeout(() => requestAnimationFrame(animate), 40);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
